@@ -7,7 +7,9 @@ Ensure the tone is professional, encouraging, and suitable for an educational co
 For example, if asked for a worksheet, create clear instructions and questions. If asked for a lesson plan, include objectives, materials, activities, and assessments.`;
 
 export const generateResource = async (prompt: string): Promise<string> => {
-  const API_KEY = process.env.API_KEY;
+  // In a Vite project, environment variables exposed to the client must be prefixed with VITE_
+  // and accessed via import.meta.env
+  const API_KEY = import.meta.env.VITE_API_KEY;
 
   if (!API_KEY) {
     // This message is user-facing as it will be caught and displayed in the UI.
