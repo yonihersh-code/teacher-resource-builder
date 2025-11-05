@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { marked } from 'marked';
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked@13.0.0/lib/marked.esm.js';
 import { ShareIcon, MailIcon, PrintIcon, CopyIcon, CheckIcon } from './icons';
 
 interface ResourceOutputProps {
@@ -20,6 +20,7 @@ const SkeletonLoader: React.FC = () => (
   </div>
 );
 
+// FIX: Correctly typed the component props using the ResourceOutputProps interface.
 const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading, error }) => {
   const [isCopied, setIsCopied] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
