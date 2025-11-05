@@ -1,5 +1,5 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
+import { marked } from 'marked';
 import { ShareIcon, MailIcon, PrintIcon, CopyIcon, CheckIcon } from './icons';
 
 interface ResourceOutputProps {
@@ -24,12 +24,27 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
   const [isCopied, setIsCopied] = useState(false);
   const outputRef = useRef<HTMLDivElement>(null);
 
+  const renderedHtml = useMemo(() => {
+    if (!resourceText) return '';
+    // For security, in a production app, you should sanitize this HTML
+    // using a library like DOMPurify to prevent XSS attacks from malicious prompts.
+    return marked.parse(resourceText, { gfm: true, breaks: true }) as string;
+  }, [resourceText]);
+
+  const plainTextContent = useMemo(() => {
+      if (typeof window === 'undefined' || !renderedHtml) return resourceText;
+      const div = document.createElement('div');
+      div.innerHTML = renderedHtml;
+      return div.textContent || div.innerText || '';
+  }, [renderedHtml, resourceText]);
+
+
   const handleShare = async () => {
-    if (navigator.share && resourceText) {
+    if (navigator.share && plainTextContent) {
       try {
         await navigator.share({
           title: 'Educational Resource',
-          text: resourceText,
+          text: plainTextContent,
         });
       } catch (err) {
         console.error('Error sharing:', err);
@@ -40,8 +55,8 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
   };
 
   const handleCopy = () => {
-    if (resourceText) {
-      navigator.clipboard.writeText(resourceText).then(() => {
+    if (plainTextContent) {
+      navigator.clipboard.writeText(plainTextContent).then(() => {
         setIsCopied(true);
         setTimeout(() => setIsCopied(false), 2000);
       });
@@ -49,9 +64,9 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
   };
 
   const handleEmail = () => {
-    if (resourceText) {
+    if (plainTextContent) {
       const subject = "Educational Resource";
-      const body = `Here is the resource you generated:\n\n${resourceText}`;
+      const body = `Here is the resource you generated:\n\n${plainTextContent}`;
       window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
   };
@@ -83,9 +98,9 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
 
       <div id="printable-area" ref={outputRef} className="p-6 overflow-y-auto flex-grow prose dark:prose-invert prose-slate max-w-none">
         {isLoading && <SkeletonLoader />}
-        {error && <div className="text-red-500 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 rounded-lg p-4">{error}</div>}
+        {error && <div className="text-red-500 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 rounded-lg p-4 not-prose">{error}</div>}
         {!isLoading && !error && !resourceText && (
-          <div className="text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center h-full">
+          <div className="text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center h-full not-prose">
              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -93,7 +108,9 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
             <p className="text-sm">Describe what you need and click "Generate Resource".</p>
           </div>
         )}
-        <div className="whitespace-pre-wrap">{resourceText}</div>
+        {hasContent && (
+           <div dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+        )}
       </div>
     </div>
   );
