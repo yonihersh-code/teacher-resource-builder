@@ -1,0 +1,5 @@
+{
+  "name": "Teacher's Resource Builder",
+  "description": "An AI-powered tool for teachers to instantly generate educational resources like lesson plans, worksheets, and quizzes based on a simple description.",
+  "requestFramePermissions": []
+}
