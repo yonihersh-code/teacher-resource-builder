@@ -97,11 +97,11 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
         )}
       </div>
 
-      <div id="printable-area" ref={outputRef} className="p-6 overflow-y-auto flex-grow prose dark:prose-invert prose-slate max-w-none">
+      <div id="printable-area" ref={outputRef} className="p-6 overflow-y-auto flex-grow">
         {isLoading && <SkeletonLoader />}
-        {error && <div className="text-red-500 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 rounded-lg p-4 not-prose">{error}</div>}
+        {error && <div className="text-red-500 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 rounded-lg p-4">{error}</div>}
         {!isLoading && !error && !resourceText && (
-          <div className="text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center h-full not-prose">
+          <div className="text-center text-slate-500 dark:text-slate-400 flex flex-col items-center justify-center h-full">
              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-slate-300 dark:text-slate-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -110,7 +110,7 @@ const ResourceOutput: React.FC<ResourceOutputProps> = ({ resourceText, isLoading
           </div>
         )}
         {hasContent && (
-           <div dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+           <div className="resource-document" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
         )}
       </div>
     </div>
